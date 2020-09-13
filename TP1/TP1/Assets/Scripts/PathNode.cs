@@ -13,6 +13,10 @@ public class PathNode
     public int hCost;
     public int fCost;
 
+    public bool isWalkable;
+
+    public Color color;
+
     public PathNode cameFromNode;
 
     public PathNode(Grid<PathNode> grid, int x, int y)
@@ -20,16 +24,19 @@ public class PathNode
         this.grid = grid;
         this.x = x;
         this.y = y;
+        this.isWalkable = true;
+        this.color = Color.white;
     }
 
     public void CalculateFCost()
     {
         fCost = gCost + hCost;
+        grid.TriggerGridObjectChanged(x, y, color);
     }
 
     public override string ToString()
     {
-        return x + "," + y;
+        return gCost.ToString();
     }
 
 }

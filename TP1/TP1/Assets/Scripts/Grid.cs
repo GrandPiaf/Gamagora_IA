@@ -13,6 +13,7 @@ public class Grid<TGridObject>
     {
         public int x;
         public int y;
+        public Color color;
     }
 
     private int width;
@@ -56,6 +57,7 @@ public class Grid<TGridObject>
         OnGridObjectChanged += (object sender, OnGridObjectChangedEventArgs eventArgs) =>
         {
             debugTextArray[eventArgs.x, eventArgs.y].text = gridArray[eventArgs.x, eventArgs.y].ToString();
+            debugTextArray[eventArgs.x, eventArgs.y].color = eventArgs.color;
         };
 
     }
@@ -93,25 +95,25 @@ public class Grid<TGridObject>
     {
         int x, y;
         GetXY(worldPosition, out x, out y);
-        SetGridObject(x, y, value);
+        SetGridObject(x, y, Color.white, value);
     }
 
-    public void SetGridObject(int x, int y, TGridObject value)
+    public void SetGridObject(int x, int y, Color color, TGridObject value)
     {
         if (x >= 0 && y >= 0 && x < width && y < height)
         {
             gridArray[x, y] = value;
             debugTextArray[x, y].text = gridArray[x, y]?.ToString();
-            if (OnGridObjectChanged != null) OnGridObjectChanged(this, new OnGridObjectChangedEventArgs { x = x, y = y });
+            if (OnGridObjectChanged != null) OnGridObjectChanged(this, new OnGridObjectChangedEventArgs { x = x, y = y, color = color });
         }
     }
 
-    public void TriggerGridObjectChanged(int x, int y)
+    public void TriggerGridObjectChanged(int x, int y, Color color)
     {
-        if(OnGridObjectChanged != null) OnGridObjectChanged(this, new OnGridObjectChangedEventArgs { x = x, y = y});
+        if(OnGridObjectChanged != null) OnGridObjectChanged(this, new OnGridObjectChangedEventArgs { x = x, y = y, color = color });
     }
 
-    private void GetXY(Vector3 worldPosition, out int x, out int y)
+    public void GetXY(Vector3 worldPosition, out int x, out int y)
     {
         x = Mathf.FloorToInt((worldPosition.x - originPosition.x)/ cellSize);
         y = Mathf.FloorToInt((worldPosition.y - originPosition.y) / cellSize);
