@@ -11,11 +11,9 @@ public class AStarEnemy : MonoBehaviour {
     //for debugging, draws the last path calculated
     public bool drawPath;
 
-    public GameObject player;
+    // Destination // Currently it's the player position
+    public GameObject destination;
 
-    Rigidbody2D body;
-    public float runSpeed = 2.0f;
-    float moveLimiter = 0.7f;
 
     private List<Node> path;
 
@@ -25,72 +23,67 @@ public class AStarEnemy : MonoBehaviour {
     Vector3 oldEnd;
     bool oldAllowDiagonals;
 
-    Node startNode;
-    Node endNode;
+    // Movement
+    float lastMovement = 0;
+    public float delay = 2.0f;
+    int nextNodeIndex = -1;
 
-    Node currentNode = null;
-    Node nextNode = null;
+    void FixedUpdate() {
 
-    int nextNodeIndex = 0;
+        float currentTime = Time.fixedTime;
+        // Cannot move until delay is finished
+        if (lastMovement + delay >= currentTime) {
+            return;
+        }
+        // Can move
+        lastMovement += delay;
 
-    void Start() {
-        body = GetComponent<Rigidbody2D>();
-    }
-
-    void Update() {
         Vector3 start = transform.position;
-        Vector3 end = player.transform.position;
+        Vector3 end = destination.transform.position;
 
         if (oldEnd != end || grid.allowDiagonals != oldAllowDiagonals) {
 
             path = FindPath(start, end);
-            nextNodeIndex = 1;
 
-            if (path != null) {
-                currentNode = path[0];
-                nextNode = path[1];
+            if(path != null) {
+                nextNodeIndex = 0;
             } else {
-                currentNode = null;
-                nextNode = null;
+                nextNodeIndex = -1;
             }
 
             oldEnd = end;
             oldAllowDiagonals = grid.allowDiagonals;
         }
 
-    }
-
-    private void FixedUpdate() {
-
-        // No path, we do not go further
-        if(currentNode == null) {
+        // No path, no movement
+        if (nextNodeIndex == -1) {
             return;
         }
 
-        if(transform.position == grid.WorldPointFromNode(nextNode) || nextNodeIndex >= path.Count) {
-            if(nextNode == endNode) {
-                Debug.Log("WE REACH TARGET");
-                currentNode = null;
-                nextNode = null;
-                return;
-            } else {
-                nextNodeIndex++;
-                currentNode = nextNode;
-                nextNode = path[nextNodeIndex];
-            }
+        // We reached destination
+        if(nextNodeIndex == path.Count) {
+            Debug.Log("REACHED DESTINATION");
+            return;
         }
 
-        float horizontal = nextNode.posX - currentNode.posX;
-        float vertical = nextNode.posY - currentNode.posY;
+        Node currentPositionNode = grid.NodeFromWorldPoint(transform.position);
 
-        if (horizontal != 0 && vertical != 0) // Check for diagonal movement
-        {
-            // limit movement speed diagonally, so you move at 70% speed
-            horizontal *= moveLimiter;
-            vertical *= moveLimiter;
+        int horizontal = path[nextNodeIndex].posX - currentPositionNode.posX;
+        int vertical = path[nextNodeIndex].posY - currentPositionNode.posY;
+
+        ++nextNodeIndex;
+
+        Vector3 nextPosition = transform.position + new Vector3(horizontal, vertical);
+        Node nextNode = grid.NodeFromWorldPoint(nextPosition);
+
+        // We cannot move there, skipping movement
+        if (nextNode.isSolid) {
+            return;
         }
 
-        body.velocity = new Vector2(horizontal * runSpeed, vertical * runSpeed);
+        // Else, moving
+        transform.position = nextPosition;
+
     }
 
     public List<Node> FindPath(Vector3 sPos, Vector3 ePos) {
@@ -98,8 +91,8 @@ public class AStarEnemy : MonoBehaviour {
         List<Node> openList = new List<Node>();
         List<Node> closedList = new List<Node>();
 
-        startNode = grid.NodeFromWorldPoint(sPos);
-        endNode = grid.NodeFromWorldPoint(ePos);
+        Node startNode = grid.NodeFromWorldPoint(sPos);
+        Node endNode = grid.NodeFromWorldPoint(ePos);
 
         startNode.gCost = 0;
         startNode.hCost = ComputeDistance(startNode, endNode);
@@ -176,11 +169,12 @@ public class AStarEnemy : MonoBehaviour {
     }
 
     public List<Node> MakePath(Node start, Node end) {
+
         List<Node> path = new List<Node>();
         Node current = end;
 
         //iterate across the elements adding them and their then parents, etc.
-        while (current.parent != start) {
+        while (current != start) {
             path.Add(current);
             current = current.parent;
         }

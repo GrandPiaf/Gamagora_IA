@@ -109,7 +109,7 @@ class Boid:
 screen = pygame.display.set_mode(size)
 
 # ball = pygame.image.load("ball.png")
-ball = pygame.image.load("chuck.png")
+ball = pygame.image.load("pig.png")
 ballrect = ball.get_rect()
 
 # create boids at random positions
