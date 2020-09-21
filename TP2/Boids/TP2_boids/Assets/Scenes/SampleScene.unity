@@ -406,9 +406,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4b88321b9b8e514db9eb617b525ca34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boidNumber: 10
-  boidPrefab: {fileID: 537543462371087719, guid: abb6436d334393343a2c3a702cdf3f61, type: 3}
-  cube: {fileID: 0}
+  boidNumber: 100
+  boidPrefab: {fileID: 537543462371087714, guid: abb6436d334393343a2c3a702cdf3f61, type: 3}
+  cube: {fileID: 1128082399}
 --- !u!1 &1928074975
 GameObject:
   m_ObjectHideFlags: 0

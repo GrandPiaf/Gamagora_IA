@@ -7,7 +7,7 @@ public class BoidManager : MonoBehaviour
     [Range(10, 100)]
     public int boidNumber;
 
-    public GameObject boidPrefab;
+    public Boid boidPrefab;
 
     public GameObject cube;
 
@@ -16,15 +16,31 @@ public class BoidManager : MonoBehaviour
 
     void Start()
     {
+        CreateBoids();
+    }
+
+    private void CreateBoids() {
         boids = new List<Boid>(boidNumber);
+
+        // Range going from (-x * 0.9) to (x * 0.9)
+        // To avoid putting boids too close to the 
+        float min = -cube.transform.localScale.x / 2 * 0.9f;
+        float max = cube.transform.localScale.x / 2 * 0.9f;
+
+        float x, y, z, rotX, rotY, rotZ;
 
         for (int i = 0; i < boidNumber; ++i) {
 
-            float x = 0;
-            float y = 0;
-            float z = 0;
-            
-            Instantiate(boidPrefab, new Vector3(x, y, z), Quaternion.identity);
+            x = Random.Range(min, max);
+            y = Random.Range(min, max);
+            z = Random.Range(min, max);
+
+            rotX = Random.Range(0, 360);
+            rotY = Random.Range(0, 360);
+            rotZ = Random.Range(0, 360);
+
+            boids.Add(Instantiate(boidPrefab, new Vector3(x, y, z), Quaternion.Euler(new Vector3(rotX, rotY, rotZ))));
         }
     }
+
 }
