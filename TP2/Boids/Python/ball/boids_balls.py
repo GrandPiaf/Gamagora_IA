@@ -140,6 +140,7 @@ while 1:
             boid.velocityX = -boid.velocityX * random.random()
         if boid.x > width - border and boid.velocityX > 0:
             boid.velocityX = -boid.velocityX * random.random()
+            
         if boid.y < border and boid.velocityY < 0:
             boid.velocityY = -boid.velocityY * random.random()
         if boid.y > height - border and boid.velocityY > 0:

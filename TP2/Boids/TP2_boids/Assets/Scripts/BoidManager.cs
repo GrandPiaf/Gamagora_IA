@@ -7,12 +7,21 @@ public class BoidManager : MonoBehaviour
     [Range(10, 100)]
     public int boidNumber;
 
+    [Range(1, 100)]
+    public float processingDistance = 20.0f;
+
+    [Range(1, 100)]
+    public float boidSpeed = 2.0f;
+
     public Boid boidPrefab;
 
     public GameObject cube;
 
     // Boid list
-    List<Boid> boids;
+    internal List<Boid> boids;
+    internal float weightCohere;
+    internal float weightSeperate;
+    internal float weightAlign;
 
     void Start()
     {
@@ -27,20 +36,41 @@ public class BoidManager : MonoBehaviour
         float min = -cube.transform.localScale.x / 2 * 0.9f;
         float max = cube.transform.localScale.x / 2 * 0.9f;
 
-        float x, y, z, rotX, rotY, rotZ;
+        float x, y, z;
+        float velocityX, velocityY, velocityZ;
 
         for (int i = 0; i < boidNumber; ++i) {
 
+            //Set position
             x = Random.Range(min, max);
             y = Random.Range(min, max);
             z = Random.Range(min, max);
 
-            rotX = Random.Range(0, 360);
-            rotY = Random.Range(0, 360);
-            rotZ = Random.Range(0, 360);
+            boids.Add(Instantiate(boidPrefab, new Vector3(x, y, z), Quaternion.identity));
 
-            boids.Add(Instantiate(boidPrefab, new Vector3(x, y, z), Quaternion.Euler(new Vector3(rotX, rotY, rotZ))));
+            //Set velocity
+            velocityX = Random.Range(1, 10) / 10.0f;
+            velocityY = Random.Range(1, 10) / 10.0f;
+            velocityZ = Random.Range(1, 10) / 10.0f;
+
+            boids[i].SetVelocity(new Vector3(velocityX, velocityY, velocityZ).normalized);
+            boids[i].SetController(this);
         }
     }
 
+
+
+    void OnDrawGizmos() {
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireCube(transform.position, transform.localScale);
+    }
+
 }
+
+
+/* THINGS TO DO
+ * Make them move in a random direction
+ * Avoid borders
+ * Then seprate, cohere, align ...
+ * vectoriel
+ */
