@@ -8,10 +8,16 @@ public class BoidManager : MonoBehaviour
     public int boidNumber;
 
     [Range(1, 100)]
-    public float processingDistance = 20.0f;
+    public float neighbourDistance = 20.0f;
+
+    [Range(1, 100)]
+    public float awayDistance = 5.0f;
 
     [Range(1, 100)]
     public float boidSpeed = 2.0f;
+
+
+
 
     public Boid boidPrefab;
 
@@ -19,9 +25,6 @@ public class BoidManager : MonoBehaviour
 
     // Boid list
     internal List<Boid> boids;
-    internal float weightCohere;
-    internal float weightSeperate;
-    internal float weightAlign;
 
     void Start()
     {

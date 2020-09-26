@@ -394,6 +394,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boidNumber: 20
   processingDistance: 20
+  boidSpeed: 30
   boidPrefab: {fileID: 9141361523470622861, guid: d43751dd65270a74181058998f78bfd7, type: 3}
   cube: {fileID: 1128082399}
 --- !u!1 &1928074975
