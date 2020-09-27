@@ -24,13 +24,13 @@ public class Boid : MonoBehaviour
         List<Boid> attractionBoids = GetNeighbours(manager.boids, manager.attractionDistance);
         Vector3 attraction = GetAttraction(attractionBoids);
 
-        //List<Boid> alignemntBoids = GetNeighbours(attractionBoids, manager.aligmentDistance);
-        //Vector3 align = GetAligment(alignemntBoids);
+        List<Boid> alignemntBoids = GetNeighbours(attractionBoids, manager.aligmentDistance);
+        Vector3 align = GetAligment(alignemntBoids);
 
-        //List<Boid> repulstionBoids = GetNeighbours(alignemntBoids, manager.repulsionDistance);
-        //Vector3 repulsion = GetRepulsion(repulstionBoids);
+        List<Boid> repulstionBoids = GetNeighbours(alignemntBoids, manager.repulsionDistance);
+        Vector3 repulsion = GetRepulsion(repulstionBoids);
 
-        velocity = attraction;
+        velocity = ((attraction + align + repulsion) / 3);
 
 
         // If close to borders, move away
@@ -64,11 +64,15 @@ public class Boid : MonoBehaviour
         transform.position += Time.deltaTime * manager.boidSpeed * velocity;
     }
 
-    // Returning the normalized vector from current position to average position of neighbours
+    // Compute the normalized vector from current position to average position of neighbours
     private Vector3 GetAttraction(List<Boid> attractionBoids) {
 
-        //Go towards the center of neighbours
+        // If no neighbours, return current velocity
+        if (attractionBoids.Count == 0) {
+            return velocity;
+        }
 
+        //Go towards the center of neighbours
         Vector3 centerPosition = Vector3.zero;
 
         foreach (Boid boid in attractionBoids) {
@@ -82,12 +86,42 @@ public class Boid : MonoBehaviour
 
     }
 
-    private Vector3 GetRepulsion(List<Boid> repulstionBoids) {
-        throw new NotImplementedException();
+    //Compute 
+    private Vector3 GetAligment(List<Boid> alignemntBoids) {
+        if (alignemntBoids.Count == 0) {
+            return velocity;
+        }
+
+        Vector3 averageDirection = Vector3.zero;
+
+        foreach (Boid boid in alignemntBoids) {
+            averageDirection += boid.velocity;
+        }
+
+        averageDirection /= alignemntBoids.Count;
+
+        return averageDirection.normalized;
     }
 
-    private Vector3 GetAligment(List<Boid> alignemntBoids) {
-        throw new NotImplementedException();
+    //Compute the normalized vector going away from the average position of neighbours
+    private Vector3 GetRepulsion(List<Boid> repulstionBoids) {
+        if (repulstionBoids.Count == 0) {
+            return velocity;
+        }
+
+        Vector3 centerPosition = Vector3.zero;
+
+        foreach (Boid boid in repulstionBoids) {
+            centerPosition += boid.transform.position;
+        }
+
+        centerPosition /= repulstionBoids.Count;
+
+        // Returning the normalized vector form centerPosition to current position
+        // Meaning we return a vector going in the other direction from the center position of neighbours
+
+        return (transform.position - centerPosition).normalized;
+
     }
 
     private List<Boid> GetNeighbours(List<Boid> boidList, float distance) {
