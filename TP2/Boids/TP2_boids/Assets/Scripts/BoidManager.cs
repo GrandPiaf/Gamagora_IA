@@ -25,6 +25,11 @@ public class BoidManager : MonoBehaviour
     public float randomAngle = 5.0f;
 
 
+    public Transform obstacle;
+
+    [Range(1, 100)]
+    public float obstacleRange;
+
 
 
     public Boid boidPrefab;

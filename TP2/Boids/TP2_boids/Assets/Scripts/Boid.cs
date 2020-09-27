@@ -30,6 +30,11 @@ public class Boid : MonoBehaviour
 
         velocity = (attraction + align + repulsion + SomeRandom(lastTickVelocity)) / 4;
 
+        Vector3 avoidObstacles;
+        if (AvoidObstacles(out avoidObstacles)) {
+            velocity = (velocity + avoidObstacles) / 2;
+        }
+
 
         // If close to borders, move away
         float borderX = manager.cube.transform.localScale.x / 2 * 0.9f;
@@ -62,6 +67,17 @@ public class Boid : MonoBehaviour
         // Apply movement
         transform.position += Time.deltaTime * manager.boidSpeed * velocity;
     }
+
+    private bool AvoidObstacles(out Vector3 avoidObstacles) {
+
+        avoidObstacles = velocity;
+        return false;
+
+
+        return true;
+    }
+
+
 
     private Vector3 SomeRandom(Vector3 lastTickVelocity) {
 
