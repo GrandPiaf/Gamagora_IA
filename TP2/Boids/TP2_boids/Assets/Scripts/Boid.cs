@@ -7,14 +7,12 @@ using UnityEngine;
 public class Boid : MonoBehaviour
 {
 
-    private BoidManager manager;
+    public BoidManager manager;
 
-    private Vector3 velocity;
+    private Vector3 velocity = Vector3.one;
 
-    void Start()
-    {
-        
-    }
+    private Vector3 lastTickVelocity = Vector3.one;
+
 
 
     void Update() {
@@ -30,7 +28,7 @@ public class Boid : MonoBehaviour
         List<Boid> repulstionBoids = GetNeighbours(alignemntBoids, manager.repulsionDistance);
         Vector3 repulsion = GetRepulsion(repulstionBoids);
 
-        velocity = ((attraction + align + repulsion) / 3);
+        velocity = (attraction + align + repulsion + SomeRandom(lastTickVelocity)) / 4;
 
 
         // If close to borders, move away
@@ -59,17 +57,31 @@ public class Boid : MonoBehaviour
         }
 
         velocity = velocity.normalized;
+        lastTickVelocity = velocity;
 
         // Apply movement
         transform.position += Time.deltaTime * manager.boidSpeed * velocity;
     }
+
+    private Vector3 SomeRandom(Vector3 lastTickVelocity) {
+
+        float angleX = UnityEngine.Random.Range(-manager.randomAngle, manager.randomAngle);
+        float angleY = UnityEngine.Random.Range(-manager.randomAngle, manager.randomAngle);
+        float angleZ = UnityEngine.Random.Range(-manager.randomAngle, manager.randomAngle);
+
+        Quaternion qt = Quaternion.Euler(angleX, angleY, angleZ);
+
+        return qt * lastTickVelocity;
+    }
+
+
 
     // Compute the normalized vector from current position to average position of neighbours
     private Vector3 GetAttraction(List<Boid> attractionBoids) {
 
         // If no neighbours, return current velocity
         if (attractionBoids.Count == 0) {
-            return velocity;
+            return lastTickVelocity;
         }
 
         //Go towards the center of neighbours
@@ -89,13 +101,13 @@ public class Boid : MonoBehaviour
     //Compute 
     private Vector3 GetAligment(List<Boid> alignemntBoids) {
         if (alignemntBoids.Count == 0) {
-            return velocity;
+            return lastTickVelocity;
         }
 
         Vector3 averageDirection = Vector3.zero;
 
         foreach (Boid boid in alignemntBoids) {
-            averageDirection += boid.velocity;
+            averageDirection += boid.lastTickVelocity;
         }
 
         averageDirection /= alignemntBoids.Count;
@@ -106,7 +118,7 @@ public class Boid : MonoBehaviour
     //Compute the normalized vector going away from the average position of neighbours
     private Vector3 GetRepulsion(List<Boid> repulstionBoids) {
         if (repulstionBoids.Count == 0) {
-            return velocity;
+            return lastTickVelocity;
         }
 
         Vector3 centerPosition = Vector3.zero;
@@ -145,6 +157,7 @@ public class Boid : MonoBehaviour
 
     internal void SetVelocity(Vector3 vel) {
         velocity = vel;
+        lastTickVelocity = vel;
     }
 
     internal void SetController(BoidManager boidManager) {

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BoidManager : MonoBehaviour
 {
-    [Range(10, 100)]
+    [Range(0, 100)]
     public int boidNumber;
 
 
@@ -20,6 +20,9 @@ public class BoidManager : MonoBehaviour
 
     [Range(1, 100)]
     public float boidSpeed = 2.0f;
+
+    [Range(0, 45)]
+    public float randomAngle = 5.0f;
 
 
 
