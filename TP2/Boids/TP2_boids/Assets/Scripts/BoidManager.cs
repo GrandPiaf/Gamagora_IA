@@ -7,11 +7,16 @@ public class BoidManager : MonoBehaviour
     [Range(10, 100)]
     public int boidNumber;
 
-    [Range(1, 100)]
-    public float neighbourDistance = 20.0f;
 
     [Range(1, 100)]
-    public float awayDistance = 5.0f;
+    public float attractionDistance = 50.0f;
+
+    [Range(1, 100)]
+    public float aligmentDistance = 20.0f;
+
+    [Range(1, 100)]
+    public float repulsionDistance = 10.0f;
+
 
     [Range(1, 100)]
     public float boidSpeed = 2.0f;

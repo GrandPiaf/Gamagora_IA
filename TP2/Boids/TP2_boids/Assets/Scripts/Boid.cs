@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Linq;
 using UnityEngine;
 
 public class Boid : MonoBehaviour
@@ -15,24 +16,21 @@ public class Boid : MonoBehaviour
         
     }
 
-    
-    void Update()
-    {
 
-        //Get closests neighbours from distance
-        List<Boid> closestBoids = new List<Boid>();
+    void Update() {
 
-        foreach (Boid other in manager.boids) {
-            if (Vector3.Distance(transform.position, other.transform.position) < manager.neighbourDistance) {
-                closestBoids.Add(other);
-            }
-        }
 
-        // Compute flocking
-        MoveCloser(closestBoids);
-        MoweWith(closestBoids);
-        MoveAway(closestBoids, manager.awayDistance);
+        //Get closests neighbours for 
+        List<Boid> attractionBoids = GetNeighbours(manager.boids, manager.attractionDistance);
+        Vector3 attraction = GetAttraction(attractionBoids);
 
+        //List<Boid> alignemntBoids = GetNeighbours(attractionBoids, manager.aligmentDistance);
+        //Vector3 align = GetAligment(alignemntBoids);
+
+        //List<Boid> repulstionBoids = GetNeighbours(alignemntBoids, manager.repulsionDistance);
+        //Vector3 repulsion = GetRepulsion(repulstionBoids);
+
+        velocity = attraction;
 
 
         // If close to borders, move away
@@ -66,88 +64,50 @@ public class Boid : MonoBehaviour
         transform.position += Time.deltaTime * manager.boidSpeed * velocity;
     }
 
+    // Returning the normalized vector from current position to average position of neighbours
+    private Vector3 GetAttraction(List<Boid> attractionBoids) {
 
-    private void MoveCloser(List<Boid> closestBoids) {
-        if (closestBoids.Count < 1) {
-            return;
+        //Go towards the center of neighbours
+
+        Vector3 centerPosition = Vector3.zero;
+
+        foreach (Boid boid in attractionBoids) {
+            centerPosition += boid.transform.position;
         }
 
-        Vector3 average = Vector3.zero;
-        foreach (Boid other in closestBoids) {
-            if (other.transform == this.transform) {
+        centerPosition /= attractionBoids.Count;
+
+        // Returning the normalized vector from current position to centerPosition
+        return (centerPosition - transform.position).normalized;
+
+    }
+
+    private Vector3 GetRepulsion(List<Boid> repulstionBoids) {
+        throw new NotImplementedException();
+    }
+
+    private Vector3 GetAligment(List<Boid> alignemntBoids) {
+        throw new NotImplementedException();
+    }
+
+    private List<Boid> GetNeighbours(List<Boid> boidList, float distance) {
+        List<Boid> closestBoids = new List<Boid>();
+
+        foreach (Boid boid in manager.boids) {
+
+            //Not taking itself
+            if(boid == this) {
                 continue;
             }
-            average += transform.position - other.transform.position;
-        }
 
-        average /= closestBoids.Count;
-
-        velocity -= (average / 100.0f);
-    }
-
-
-    private void MoweWith(List<Boid> closestBoids) {
-        if (closestBoids.Count < 1) {
-            return;
-        }
-
-        Vector3 average = Vector3.zero;
-        foreach (Boid other in closestBoids) {
-            average += other.velocity;
-        }
-
-        average /= closestBoids.Count;
-
-        velocity += (average / 40.0f);
-
-    }
-
-
-    private void MoveAway(List<Boid> closestBoids, float awayDistance) {
-        if (closestBoids.Count < 1) {
-            return;
-        }
-
-        Vector3 distanceTot = Vector3.zero;
-        int numClose = 0;
-
-        foreach (Boid other in closestBoids) {
-
-            float dist = Vector3.Distance(transform.position, other.transform.position);
-
-            if(dist < awayDistance) {
-
-                ++numClose;
-
-                Vector3 diff = transform.position - other.transform.position;
-
-                if (diff.x >= 0) {
-                    diff.x = Mathf.Sqrt(awayDistance) - diff.x;
-                }
-
-                if (diff.y >= 0) {
-                    diff.y = Mathf.Sqrt(awayDistance) - diff.y;
-                }
-
-                if (diff.z >= 0) {
-                    diff.z = Mathf.Sqrt(awayDistance) - diff.z;
-                }
-
-                distanceTot += diff;
-
+            if (Vector3.Distance(transform.position, boid.transform.position) <= distance) {
+                closestBoids.Add(boid);
             }
-
         }
 
-        if(numClose == 0) {
-            return;
-        }
-
-        velocity -= distanceTot / 5.0f;
-
+        return closestBoids;
     }
 
-    
 
     internal void SetVelocity(Vector3 vel) {
         velocity = vel;
