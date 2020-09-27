@@ -93,8 +93,15 @@ public class Boid : MonoBehaviour
 
         centerPosition /= attractionBoids.Count;
 
+        Vector3 attraction = (centerPosition - transform.position).normalized;
+
+        if (manager.target != null) {
+            attraction += (manager.target.transform.position - transform.position).normalized;
+            attraction /= 2;
+        }
+
         // Returning the normalized vector from current position to centerPosition
-        return (centerPosition - transform.position).normalized;
+        return attraction;
 
     }
 

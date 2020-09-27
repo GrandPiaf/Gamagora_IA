@@ -31,6 +31,8 @@ public class BoidManager : MonoBehaviour
 
     public GameObject cube;
 
+    public GameObject target;
+
     // Boid list
     internal List<Boid> boids;
 
