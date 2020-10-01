@@ -71,11 +71,15 @@ public class Boid : MonoBehaviour
     private bool AvoidObstacles(out Vector3 avoidObstacles) {
         avoidObstacles = velocity;
 
-        if (Vector3.Distance(manager.obstacle.position, transform.position) > manager.obstacleRange) {
+        Vector3 toObstacle = (manager.obstacle.position - transform.position).normalized;
+
+        float angle = Vector3.Angle(transform.forward, toObstacle);
+
+        if (angle > 90 && angle < 270) {
             return false;
         }
 
-        avoidObstacles = (transform.position - manager.obstacle.position).normalized;
+        avoidObstacles = Vector3.Cross(toObstacle, Vector3.up);
 
         return true;
     }
