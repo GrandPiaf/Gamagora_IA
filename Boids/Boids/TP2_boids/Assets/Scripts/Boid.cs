@@ -30,11 +30,6 @@ public class Boid : MonoBehaviour
 
         velocity = (attraction + align + repulsion + SomeRandom(lastTickVelocity)) / 4;
 
-        Vector3 avoidObstacles;
-        if (AvoidObstacles(out avoidObstacles)) {
-            velocity = (velocity + avoidObstacles) / 2;
-        }
-
 
         // If close to borders, move away
         float borderX = manager.cube.transform.localScale.x / 2 * 0.9f;
@@ -66,22 +61,6 @@ public class Boid : MonoBehaviour
 
         // Apply movement
         transform.position += Time.deltaTime * manager.boidSpeed * velocity;
-    }
-
-    private bool AvoidObstacles(out Vector3 avoidObstacles) {
-        avoidObstacles = velocity;
-
-        Vector3 toObstacle = (manager.obstacle.position - transform.position).normalized;
-
-        float angle = Vector3.Angle(transform.forward, toObstacle);
-
-        if (angle > 90 && angle < 270) {
-            return false;
-        }
-
-        avoidObstacles = Vector3.Cross(toObstacle, Vector3.up);
-
-        return true;
     }
 
     
@@ -162,7 +141,17 @@ public class Boid : MonoBehaviour
         // Returning the normalized vector form centerPosition to current position
         // Meaning we return a vector going in the other direction from the center position of neighbours
 
-        return (transform.position - centerPosition).normalized;
+        Vector3 positionToCenterPosition = (transform.position - centerPosition).normalized;
+
+        if (Vector3.Distance(manager.obstacle.position, transform.position) > manager.obstacleRange) {
+            return positionToCenterPosition;
+        }
+
+        // Else
+
+        Vector3 obstacleToPosition = (transform.position - manager.obstacle.position).normalized;
+
+        return (positionToCenterPosition + obstacleToPosition) / 2;
 
     }
 

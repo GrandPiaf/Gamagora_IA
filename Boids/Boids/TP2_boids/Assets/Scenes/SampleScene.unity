@@ -485,10 +485,10 @@ MonoBehaviour:
   boidSpeed: 30
   randomAngle: 5
   obstacle: {fileID: 324744289}
-  obstacleRange: 5
+  obstacleRange: 20
   boidPrefab: {fileID: 9141361523470622861, guid: d43751dd65270a74181058998f78bfd7, type: 3}
   cube: {fileID: 1128082399}
-  target: {fileID: 3121634916120623977}
+  target: {fileID: 0}
 --- !u!1 &1928074975
 GameObject:
   m_ObjectHideFlags: 0
