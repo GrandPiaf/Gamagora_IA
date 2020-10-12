@@ -8,10 +8,17 @@ public class Player : MonoBehaviour
 {
     public PathGrid grid;
 
-    float lastMovement = 0;
-    public float delay = 2.0f;
+    public float movementTimer = 0;
+    public float movementDelay = 2.0f;
 
-    void FixedUpdate() {
+
+    /** FSM **/
+    internal PlayerState currentState = PlayerState.Move;
+
+
+    void Update() {
+
+        
 
         int horizontal = (int)Input.GetAxisRaw("Horizontal");
         int vertical = (int)Input.GetAxisRaw("Vertical");
@@ -21,15 +28,15 @@ public class Player : MonoBehaviour
             vertical = 0;
         }
 
-        float currentTime = Time.fixedTime;
+        movementTimer += Time.deltaTime;
 
         // Cannot move until delay is finished
-        if (lastMovement + delay >= currentTime) {
+        if (movementDelay > movementTimer) {
             return;
         }
 
         // Can move
-        lastMovement += delay;
+        movementTimer -= movementDelay;
 
 
         Vector3 nextPosition = transform.position + new Vector3(horizontal, vertical);
@@ -42,6 +49,37 @@ public class Player : MonoBehaviour
 
         // Else, moving
         transform.position = nextPosition;
+
+    }
+
+    void OnTriggerEnter2D(Collider2D collision) {
+
+        GameObject go = collision.gameObject;
+
+        // If it is an enemy
+        if (go.GetComponent<AStarEnemy>() != null) 
+            switch (currentState) {
+                case PlayerState.Move:
+                    Debug.Log("PLAYER LOSE");
+                    Destroy(gameObject);
+                    break;
+                case PlayerState.Eat:
+                    Debug.Log("ENEMY LOSE");
+                    Destroy(go);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        //If it is a pastille
+        if (go.GetComponent<Pastille>() != null) {
+            currentState = PlayerState.Eat;
+            Destroy(go);
+        }
+
+        // Else, we don't know what type is the collision
+        // Do nothing
 
     }
 }

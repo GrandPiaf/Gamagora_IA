@@ -24,19 +24,24 @@ public class AStarEnemy : MonoBehaviour {
     bool oldAllowDiagonals;
 
     // Movement
-    float lastMovement = 0;
-    public float delay = 2.0f;
+    public float movementTimer = 0;
+    public float movementDelay = 2.0f;
+
     int nextNodeIndex = -1;
 
-    void FixedUpdate() {
+    void Update() {
 
-        float currentTime = Time.fixedTime;
+        movementTimer += Time.deltaTime;
+
         // Cannot move until delay is finished
-        if (lastMovement + delay >= currentTime) {
+        if (movementDelay > movementTimer) {
             return;
         }
+
         // Can move
-        lastMovement += delay;
+        movementTimer -= movementDelay;
+
+
 
         Vector3 start = transform.position;
         Vector3 end = destination.transform.position;
