@@ -30,16 +30,16 @@ public class BoidManager : MonoBehaviour
     [Range(1, 100)]
     public float obstacleRange;
 
+    public GameObject target;
+
 
 
     public Boid boidPrefab;
 
     public GameObject cube;
 
-    public GameObject target;
-
     // Boid list
-    internal List<Boid> boids;
+    public List<Boid> boids;
 
     void Start()
     {

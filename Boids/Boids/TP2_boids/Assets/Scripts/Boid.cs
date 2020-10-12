@@ -60,7 +60,10 @@ public class Boid : MonoBehaviour
         lastTickVelocity = velocity;
 
         // Apply movement
-        transform.position += Time.deltaTime * manager.boidSpeed * velocity;
+        Vector3 nextPos = transform.position + Time.deltaTime * manager.boidSpeed * velocity;
+        transform.rotation = Quaternion.LookRotation(transform.position - nextPos);
+        transform.position = nextPos;
+    
     }
 
     
@@ -143,15 +146,17 @@ public class Boid : MonoBehaviour
 
         Vector3 positionToCenterPosition = (transform.position - centerPosition).normalized;
 
-        if (Vector3.Distance(manager.obstacle.position, transform.position) > manager.obstacleRange) {
-            return positionToCenterPosition;
+        if (manager.obstacle != null) {
+            if (Vector3.Distance(manager.obstacle.position, transform.position) > manager.obstacleRange) {
+                return positionToCenterPosition;
+            }
+
+            // Else
+            Vector3 obstacleToPosition = (transform.position - manager.obstacle.position).normalized;
+            return (positionToCenterPosition + obstacleToPosition) / 2;
         }
-
         // Else
-
-        Vector3 obstacleToPosition = (transform.position - manager.obstacle.position).normalized;
-
-        return (positionToCenterPosition + obstacleToPosition) / 2;
+        return positionToCenterPosition;
 
     }
 
