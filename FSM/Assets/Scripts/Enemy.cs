@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AStarEnemy : MonoBehaviour {
+public class Enemy : MonoBehaviour {
 
     public PathGrid grid;
 
@@ -12,7 +12,7 @@ public class AStarEnemy : MonoBehaviour {
     public bool drawPath;
 
     // Destination // Currently it's the player position
-    public GameObject destination;
+    public Player player;
 
 
     private List<Node> path;
@@ -29,6 +29,14 @@ public class AStarEnemy : MonoBehaviour {
 
     int nextNodeIndex = -1;
 
+
+    // STATE
+    public float seeDistance;
+    public float loosingDistance;
+    public EnemyState currentState = EnemyState.Roam;
+
+
+
     void Update() {
 
         movementTimer += Time.deltaTime;
@@ -42,15 +50,60 @@ public class AStarEnemy : MonoBehaviour {
         movementTimer -= movementDelay;
 
 
+        switch (currentState) {
 
+            case EnemyState.Roam:
+                roam();
+                break;
+
+            case EnemyState.Chase:
+                chase();
+                break;
+
+            case EnemyState.Evade:
+                evade();
+                break;
+        }
+
+    }
+
+    private void roam() {
+        //Random movement around
+        int horizontal = UnityEngine.Random.Range(0, 2) * 2 - 1;
+        int vertical = UnityEngine.Random.Range(0, 2) * 2 - 1;
+
+        if (!grid.allowDiagonals && horizontal != 0 && vertical != 0) {
+            horizontal = 0;
+        }
+
+        Vector3 nextPosition = transform.position + new Vector3(horizontal, vertical);
+        Node nextNode = grid.NodeFromWorldPoint(nextPosition);
+
+        // We cannot move there, skipping movement
+        if (nextNode.isSolid) {
+            return;
+        }
+
+        // Else, moving
+        transform.position = nextPosition;
+
+        if (Vector3.Distance(transform.position, player.transform.position) <= seeDistance) {
+            currentState = EnemyState.Chase;
+        }
+        if (player.currentState == PlayerState.Eat) {
+            currentState = EnemyState.Evade;
+        }
+    }
+
+    private void chase() {
         Vector3 start = transform.position;
-        Vector3 end = destination.transform.position;
+        Vector3 end = player.transform.position;
 
         if (oldEnd != end || grid.allowDiagonals != oldAllowDiagonals) {
 
             path = FindPath(start, end);
 
-            if(path != null) {
+            if (path != null) {
                 nextNodeIndex = 0;
             } else {
                 nextNodeIndex = -1;
@@ -66,7 +119,7 @@ public class AStarEnemy : MonoBehaviour {
         }
 
         // We reached destination
-        if(nextNodeIndex == path.Count) {
+        if (nextNodeIndex == path.Count) {
             Debug.Log("REACHED DESTINATION");
             return;
         }
@@ -89,6 +142,52 @@ public class AStarEnemy : MonoBehaviour {
         // Else, moving
         transform.position = nextPosition;
 
+        if (Vector3.Distance(transform.position, player.transform.position) > loosingDistance) {
+            currentState = EnemyState.Roam;
+        }
+        if (player.currentState == PlayerState.Eat) {
+            currentState = EnemyState.Evade;
+        }
+    }
+
+    private void evade() {
+
+        Vector3 playerToEnemy = transform.position - player.transform.position;
+        playerToEnemy.Normalize();
+
+        int horizontal = 0;
+        int vertical = 0;
+
+        if (playerToEnemy.x >= 0.5f) { //Moving horizontally
+            horizontal = 1;
+        } else if(playerToEnemy.x <= -0.5f) {
+            horizontal = -1;
+        }
+
+        if (playerToEnemy.y >= 0.5f) { //Moving vertically
+            vertical = 1;
+        } else if (playerToEnemy.y <= -0.5f) {
+            vertical = -1;
+        }
+
+        if (!grid.allowDiagonals && horizontal != 0 && vertical != 0) {
+            horizontal = 0;
+        }
+
+        Vector3 nextPosition = transform.position + new Vector3(horizontal, vertical);
+        Node nextNode = grid.NodeFromWorldPoint(nextPosition);
+
+        // We cannot move there, skipping movement
+        if (nextNode.isSolid) {
+            return;
+        }
+
+        // Else, moving
+        transform.position = nextPosition;
+
+        if (player.currentState == PlayerState.Move) {
+            currentState = EnemyState.Roam;
+        }
     }
 
     public List<Node> FindPath(Vector3 sPos, Vector3 ePos) {

@@ -14,14 +14,10 @@ public class Player : MonoBehaviour
 
 
     /** FSM **/
-    internal PlayerState currentState = PlayerState.Move;
+    public PlayerState currentState = PlayerState.Move;
 
 
     void Update() {
-
-        FSM();
-
-
 
         int horizontal = (int)Input.GetAxisRaw("Horizontal");
         int vertical = (int)Input.GetAxisRaw("Vertical");
@@ -55,19 +51,12 @@ public class Player : MonoBehaviour
 
     }
 
-    // FSM Management
-    void FSM() {
-        // 2 states :
-        //  - Move : The player move around the game & can be eaten by the frog -> in this case it loose
-        //  - Eat : The player move around & can eat the frog -> In this case, it wins
-    }
-
     void OnTriggerEnter2D(Collider2D collision) {
 
         GameObject go = collision.gameObject;
 
         // If it is an enemy
-        if (go.GetComponent<AStarEnemy>() != null) {
+        if (go.GetComponent<Enemy>() != null) {
             switch (currentState) {
                 case PlayerState.Move:
                     Debug.Log("PLAYER LOSE");

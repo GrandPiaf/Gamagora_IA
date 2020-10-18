@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-enum PlayerState {
+public enum PlayerState {
     Move,
     Eat
 }

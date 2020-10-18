@@ -2452,8 +2452,8 @@ GameObject:
   m_Component:
   - component: {fileID: 123941059}
   - component: {fileID: 123941058}
-  - component: {fileID: 123941060}
   - component: {fileID: 123941061}
+  - component: {fileID: 123941060}
   m_Layer: 0
   m_Name: prince_ribbit
   m_TagString: Untagged
@@ -2520,7 +2520,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 123941057}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 18.5, y: 8.5, z: 0}
+  m_LocalPosition: {x: 15.5, y: 9.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -2540,9 +2540,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grid: {fileID: 41285318}
   drawPath: 1
-  destination: {fileID: 1834061250}
+  player: {fileID: 1834061253}
   movementTimer: 0
   movementDelay: 1
+  seeDistance: 10
+  loosingDistance: 15
+  currentState: 0
 --- !u!61 &123941061
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2730,7 +2733,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1199676662}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.5, y: -3.5, z: 0}
+  m_LocalPosition: {x: -4.5, y: -3.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -12151,6 +12154,7 @@ MonoBehaviour:
   grid: {fileID: 41285318}
   movementTimer: 0
   movementDelay: 0.5
+  currentState: 0
 --- !u!61 &1834061254
 BoxCollider2D:
   m_ObjectHideFlags: 0
